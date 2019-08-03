@@ -51,34 +51,65 @@ static struct etimer timer;
 static int temperature;
 static thermostat_status status;
 
-RESOURCE(get_status, METHOD_GET, "status", "title=\"Current Status: ?len=0..\";rt=\"Text\"");
-void get_status_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+RESOURCE(discover, METHOD_GET, ".well-known/core", "");
+void discover_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-    const char *len = NULL;
-    char message[100];
-    /* Some data that has the length up to REST_MAX_CHUNK_SIZE. For more, see the chunk resource. */
-    sprintf(message, "%d,%d.%d", status.air_conditioning, status.heating, status.ventilation);
-    //char const * const message = "Hello World! ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy";
-    int length = 12; /*           |<-------->| */
+  char temp[100];
+  int index = 0;
+  index += sprintf(temp + index, "%s,", "</helloworld>;n=\"HelloWorld\"");
+// #if defined (PLATFORM_HAS_LEDS)
+//   index += sprintf(temp + index, "%s,", "</led>;n=\"LedControl\"");
+// #endif
+// #if defined (PLATFORM_HAS_LIGHT)
+//   index += sprintf(temp + index, "%s", "</light>;n=\"Light\"");
+// #endif
 
-    /* The query string can be retrieved by rest_get_query() or parsed for its key-value pairs. */
-    if (REST.get_query_variable(request, "len", &len))
-    {
-        length = atoi(len);
-        if (length < 0)
-            length = 0;
-        if (length > REST_MAX_CHUNK_SIZE)
-            length = REST_MAX_CHUNK_SIZE;
-        memcpy(buffer, message, length);
-    }
-    else
-    {
-        memcpy(buffer, message, length);
-    }
+  REST.set_response_payload(response, (uint8_t*)temp, strlen(temp));
+  REST.set_header_content_type(response, APPLICATION_LINK_FORMAT);
+}
 
-    REST.set_header_content_type(response, REST.type.TEXT_PLAIN); /* text/plain is the default, hence this option could be omitted. */
-    REST.set_header_etag(response, (uint8_t *)&length, 1);
-    REST.set_response_payload(response, buffer, length);
+RESOURCE(get_status, METHOD_GET, "status", "title=\"Current Status \";rt=\"Text\"");
+void get_status_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+{  
+    char message[REST_MAX_CHUNK_SIZE];
+    sprintf(message, "AC: %d, HEATER: %d, VENTILATION: %d", status.air_conditioning, status.heating, status.ventilation);
+
+    REST.set_header_content_type(response, TEXT_PLAIN);
+    REST.set_response_payload(response, (uint8_t*)message, strlen(message));
+}
+
+PERIODIC_RESOURCE(get_temperature, METHOD_GET, "temperature", "title=\"Temperature\";obs", 5*CLOCK_SECOND);
+void get_temperature_handler(void* request, void* response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
+{
+  REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
+
+  /* Usually, a CoAP server would response with the resource representation matching the periodic_handler. */
+  const char *msg = "It's periodic!";
+  REST.set_response_payload(response, msg, strlen(msg));
+
+  /* A post_handler that handles subscriptions will be called for periodic resources by the REST framework. */
+}
+
+/*
+ * Additionally, a handler function named [resource name]_handler must be implemented for each PERIODIC_RESOURCE.
+ * It will be called by the REST manager process with the defined period.
+ */
+void get_temperature_periodic_handler(resource_t *r)
+{
+  static uint16_t obs_counter = 0;
+  static char content[20];
+
+  ++obs_counter;
+
+  //PRINTF("TICK %u for /%s\n", obs_counter, r->url);
+
+  /* Build notification. */
+  coap_packet_t notification[1]; /* This way the packet can be treated as pointer as usual. */
+  coap_init_message(notification, COAP_TYPE_NON, REST.status.OK, 0 );
+  coap_set_payload(notification, content, snprintf(content, sizeof(content), "Temprature: %d", temperature));
+
+  /* Notify the registered observers with the given message type, observe option, and payload. */
+  REST.notify_subscribers(r, obs_counter, notification);
 }
 
 RESOURCE(set_device, METHOD_POST | METHOD_PUT, "set", "title=\"DEVICEs: ?device=ac|heater|ventilation, POST/PUT mode=on|off\";rt=\"Control\"");
@@ -114,12 +145,12 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
         if (strncmp(device, "ac", len) == 0)
         {
-            led = LEDS_RED;
+            led = LEDS_BLUE;
             new_status.air_conditioning = new_mode;
         }
         else if (strncmp(device, "heater", len) == 0)
         {
-            led = LEDS_BLUE;
+            led = LEDS_RED;
             new_status.heating = new_mode;
         }
         else if (strncmp(device, "ventilation", len) == 0)
@@ -181,6 +212,7 @@ PROCESS_THREAD(sensor_smtthmst_process, ev, data)
     rest_init_engine();
     rest_activate_resource(&resource_get_status);
     rest_activate_resource(&resource_set_device);
+    rest_activate_periodic_resource(&periodic_resource_get_temperature);
 
     while (1)
     {
