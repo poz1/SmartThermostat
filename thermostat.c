@@ -56,19 +56,15 @@ void discover_handler(void *request, void *response, uint8_t *buffer, uint16_t p
 {
   char temp[100];
   int index = 0;
-  index += sprintf(temp + index, "%s,", "</helloworld>;n=\"HelloWorld\"");
-// #if defined (PLATFORM_HAS_LEDS)
-//   index += sprintf(temp + index, "%s,", "</led>;n=\"LedControl\"");
-// #endif
-// #if defined (PLATFORM_HAS_LIGHT)
-//   index += sprintf(temp + index, "%s", "</light>;n=\"Light\"");
-// #endif
+  index += sprintf(temp + index, "%s,", "</status>;n=\"Status\"");
+  index += sprintf(temp + index, "%s,", "</temperature>;n=\"Temperature\"");
+  index += sprintf(temp + index, "%s,", "</set>;n=\"Set Device Mode\"");
 
   REST.set_response_payload(response, (uint8_t*)temp, strlen(temp));
   REST.set_header_content_type(response, APPLICATION_LINK_FORMAT);
 }
 
-RESOURCE(get_status, METHOD_GET, "status", "title=\"Current Status \";rt=\"Text\"");
+RESOURCE(get_status, METHOD_GET, "status", "title=\"Status \";rt=\"Text\"");
 void get_status_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {  
     char message[REST_MAX_CHUNK_SIZE];
@@ -81,19 +77,11 @@ void get_status_handler(void *request, void *response, uint8_t *buffer, uint16_t
 PERIODIC_RESOURCE(get_temperature, METHOD_GET, "temperature", "title=\"Temperature\";obs", 5*CLOCK_SECOND);
 void get_temperature_handler(void* request, void* response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-  REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-
-  /* Usually, a CoAP server would response with the resource representation matching the periodic_handler. */
-  const char *msg = "It's periodic!";
-  REST.set_response_payload(response, msg, strlen(msg));
-
-  /* A post_handler that handles subscriptions will be called for periodic resources by the REST framework. */
+    static char content[20];
+    REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
+    REST.set_response_payload(response, snprintf(content, sizeof(content), "Temperature: %d", temperature), strlen(content));
 }
 
-/*
- * Additionally, a handler function named [resource name]_handler must be implemented for each PERIODIC_RESOURCE.
- * It will be called by the REST manager process with the defined period.
- */
 void get_temperature_periodic_handler(resource_t *r)
 {
   static uint16_t obs_counter = 0;
@@ -101,18 +89,14 @@ void get_temperature_periodic_handler(resource_t *r)
 
   ++obs_counter;
 
-  //PRINTF("TICK %u for /%s\n", obs_counter, r->url);
-
-  /* Build notification. */
-  coap_packet_t notification[1]; /* This way the packet can be treated as pointer as usual. */
+  coap_packet_t notification[1];
   coap_init_message(notification, COAP_TYPE_NON, REST.status.OK, 0 );
-  coap_set_payload(notification, content, snprintf(content, sizeof(content), "Temprature: %d", temperature));
+  coap_set_payload(notification, content, snprintf(content, sizeof(content), "Temperature: %d", temperature));
 
-  /* Notify the registered observers with the given message type, observe option, and payload. */
   REST.notify_subscribers(r, obs_counter, notification);
 }
 
-RESOURCE(set_device, METHOD_POST | METHOD_PUT, "set", "title=\"DEVICEs: ?device=ac|heater|ventilation, POST/PUT mode=on|off\";rt=\"Control\"");
+RESOURCE(set_device, METHOD_POST | METHOD_PUT, "set", "title=\"Device: ?device=ac|heater|ventilation, POST/PUT mode=on|off\";rt=\"Control\"");
 void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
     size_t len = 0;
