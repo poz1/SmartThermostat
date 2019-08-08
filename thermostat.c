@@ -64,39 +64,39 @@ void discover_handler(void *request, void *response, uint8_t *buffer, uint16_t p
   REST.set_header_content_type(response, APPLICATION_LINK_FORMAT);
 }
 
-RESOURCE(get_status, METHOD_GET, "status", "title=\"Status \";rt=\"Text\"");
+RESOURCE(get_status, METHOD_GET, "status", "title=\"Status\"");
 void get_status_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {  
     char message[REST_MAX_CHUNK_SIZE];
-    sprintf(message, "AC: %d, HEATER: %d, VENTILATION: %d", status.air_conditioning, status.heating, status.ventilation);
+    sprintf(message, "{\"ac\":%s,\"heater\":%s,\"vent\":%s}", status.air_conditioning?"true":"false", status.heating?"true":"false", status.ventilation?"true":"false");
 
-    REST.set_header_content_type(response, TEXT_PLAIN);
+    REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
     REST.set_response_payload(response, (uint8_t*)message, strlen(message));
 }
 
 PERIODIC_RESOURCE(get_temperature, METHOD_GET, "temperature", "title=\"Temperature\";obs", 5*CLOCK_SECOND);
 void get_temperature_handler(void* request, void* response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
-    static char content[20];
-    REST.set_header_content_type(response, REST.type.TEXT_PLAIN);
-    REST.set_response_payload(response, snprintf(content, sizeof(content), "Temperature: %d", temperature), strlen(content));
+    static char content[REST_MAX_CHUNK_SIZE];
+    REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
+    REST.set_response_payload(response, snprintf(content, sizeof(content), "{\"temperature\":%d}", temperature), strlen(content));
 }
 
 void get_temperature_periodic_handler(resource_t *r)
 {
   static uint16_t obs_counter = 0;
-  static char content[20];
+  static char content[REST_MAX_CHUNK_SIZE];
 
   ++obs_counter;
 
   coap_packet_t notification[1];
   coap_init_message(notification, COAP_TYPE_NON, REST.status.OK, 0 );
-  coap_set_payload(notification, content, snprintf(content, sizeof(content), "Temperature: %d", temperature));
+  coap_set_payload(notification, content, snprintf(content, sizeof(content), "{\"temperature\":%d}", temperature));
 
   REST.notify_subscribers(r, obs_counter, notification);
 }
 
-RESOURCE(set_device, METHOD_POST | METHOD_PUT, "set", "title=\"Device: ?device=ac|heater|ventilation, POST/PUT mode=on|off\";rt=\"Control\"");
+RESOURCE(set_device, METHOD_POST | METHOD_PUT, "set", "title=\"Device: ?device=ac|heater|ventilation, POST/PUT mode=on|off\";rt=\"Control\";ct=50");
 void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t preferred_size, int32_t *offset)
 {
     size_t len = 0;
@@ -106,11 +106,10 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
     const char *mode = NULL;
     uint8_t led = 0;
     bool success;
+    static char content[40];
 
     if ((len = REST.get_post_variable(request, "mode", &mode)))
     {
-        printf("mode: %s\n", mode);
-
         if (strncmp(mode, "on", len) == 0)
         {
             new_mode = true;
@@ -125,8 +124,6 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
     if (success && (len = REST.get_query_variable(request, "device", &device)))
     {
-        printf("device: %.*s\n", len, device);
-
         if (strncmp(device, "ac", len) == 0)
         {
             led = LEDS_BLUE;
@@ -151,9 +148,15 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
     {
         success = false;
     }
-
+        
+    //printf("Setting device: %s, to mode: %s", device, mode);
     if (!success || (new_status.air_conditioning && new_status.heating))
     {
+        char message[REST_MAX_CHUNK_SIZE];
+        sprintf(message, "{\"status\":\"error\"}");
+
+        REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
+        REST.set_response_payload(response, (uint8_t*)message, strlen(message));
         REST.set_response_status(response, REST.status.BAD_REQUEST);
     }
     else
@@ -168,11 +171,11 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
 static void update_temperature(int *temperature, thermostat_status *status)
 {
-    printf("Current Temperature: %d.\n", *temperature);
-    printf("Current Status:\n");
-    printf("AC: %d\n", status->air_conditioning);
-    printf("Heating: %d\n", status->heating);
-    printf("Ventilation: %d\n", status->ventilation);
+    // printf("Current Temperature: %d.\n", *temperature);
+    // printf("Current Status:\n");
+    // printf("AC: %d\n", status->air_conditioning);
+    // printf("Heating: %d\n", status->heating);
+    // printf("Ventilation: %d\n", status->ventilation);
 
     int multiplier = status->ventilation ? ventilation_multiplier : 1;
 
