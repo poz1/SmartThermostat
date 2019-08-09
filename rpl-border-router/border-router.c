@@ -111,7 +111,7 @@ static const char *BOTTOM = "</body></html>\n";
 #if BUF_USES_STACK
 static char *bufptr, *bufend;
 #define ADD(...) do {                                                   \
-    bufptr += snprintf(bufptr, bufend - bufptr, __VA_ARGS__);      \
+    bufptr += snprintf(bufptr, bufend - bufptr, __VA_ARGS__);           \
   } while(0)
 #else
 static char buf[256];

@@ -149,7 +149,6 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
         success = false;
     }
         
-    //printf("Setting device: %s, to mode: %s", device, mode);
     if (!success || (new_status.air_conditioning && new_status.heating))
     {
         char message[REST_MAX_CHUNK_SIZE];
@@ -166,6 +165,12 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
             leds_on(led);
         else
             leds_off(led);
+
+        char message[REST_MAX_CHUNK_SIZE];
+        sprintf(message, "{\"status\":\"ok\"}");
+        printf("Setting device: %s, to mode: %s", device, mode);
+        REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
+        REST.set_response_payload(response, (uint8_t*)message, strlen(message));
     }
 }
 
@@ -183,6 +188,8 @@ static void update_temperature(int *temperature, thermostat_status *status)
         *temperature += (air_conditioning_factor * multiplier);
     else if (status->heating)
         *temperature += (heating_factor * multiplier);
+
+    printf("Updating Temperature to: %d\n", *temperature);    
 }
 
 PROCESS(sensor_smtthmst_process, "Smart Thermostat");
