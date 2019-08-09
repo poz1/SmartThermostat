@@ -202,7 +202,7 @@ AUTOSTART_PROCESSES(&sensor_smtthmst_process);
 PROCESS_THREAD(sensor_smtthmst_process, ev, data)
 {
     PROCESS_BEGIN();
-    random_init(clock_seconds());
+    random_init(rimeaddr_node_addr.u8[3]);
     temperature = (random_rand() % 20) + 11;
     printf("Setting initial random temperature to: %d degrees.\n", temperature);
 
