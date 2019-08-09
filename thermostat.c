@@ -104,6 +104,7 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
     bool new_mode;
     const char *device = NULL;
     const char *mode = NULL;
+    const char dev[11];
     uint8_t led = 0;
     bool success;
     static char content[40];
@@ -124,6 +125,7 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
 
     if (success && (len = REST.get_query_variable(request, "device", &device)))
     {
+        strncpy(dev, device, len);
         if (strncmp(device, "ac", len) == 0)
         {
             led = LEDS_BLUE;
@@ -153,7 +155,7 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
     {
         char message[REST_MAX_CHUNK_SIZE];
         sprintf(message, "{\"status\":\"error\"}");
-
+        printf("Error while changing %s to mode: %s\n", dev, mode);
         REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
         REST.set_response_payload(response, (uint8_t*)message, strlen(message));
         REST.set_response_status(response, REST.status.BAD_REQUEST);
@@ -167,9 +169,10 @@ void set_device_handler(void *request, void *response, uint8_t *buffer, uint16_t
             leds_off(led);
 
         char message[REST_MAX_CHUNK_SIZE];
-        sprintf(message, "{\"status\":\"ok\"}");
-        printf("Setting device: %s, to mode: %s", device, mode);
+
+        printf("Changing %s to mode: %s\n", dev, mode);
         REST.set_header_content_type(response, REST.type.APPLICATION_JSON);
+        sprintf(message, "{\"status\":\"ok\"}");
         REST.set_response_payload(response, (uint8_t*)message, strlen(message));
     }
 }
@@ -181,7 +184,7 @@ static void update_temperature(int *temperature, thermostat_status *status)
     // printf("AC: %d\n", status->air_conditioning);
     // printf("Heating: %d\n", status->heating);
     // printf("Ventilation: %d\n", status->ventilation);
-
+    int oldTemp = *temperature;
     int multiplier = status->ventilation ? ventilation_multiplier : 1;
 
     if (status->air_conditioning)
@@ -189,7 +192,8 @@ static void update_temperature(int *temperature, thermostat_status *status)
     else if (status->heating)
         *temperature += (heating_factor * multiplier);
 
-    printf("Updating Temperature to: %d\n", *temperature);    
+    if(oldTemp != *temperature)
+        printf("Updating Temperature to: %d\n", *temperature);    
 }
 
 PROCESS(sensor_smtthmst_process, "Smart Thermostat");
@@ -198,7 +202,7 @@ AUTOSTART_PROCESSES(&sensor_smtthmst_process);
 PROCESS_THREAD(sensor_smtthmst_process, ev, data)
 {
     PROCESS_BEGIN();
-
+    random_init(clock_seconds());
     temperature = (random_rand() % 20) + 11;
     printf("Setting initial random temperature to: %d degrees.\n", temperature);
 
