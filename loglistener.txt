@@ -1,0 +1,125 @@
+00:00.502	ID:2	Rime started with address 0.18.116.2.0.2.2.2
+00:00.510	ID:2	MAC 00:12:74:02:00:02:02:02 Contiki 2.7 started. Node id is set to 2.
+00:00.517	ID:2	CSMA nullrdc, channel check rate 128 Hz, radio channel 26
+00:00.527	ID:2	Tentative link-local IPv6 address fe80:0000:0000:0000:0212:7402:0002:0202
+00:00.529	ID:2	Starting 'Smart Thermostat'
+00:00.533	ID:2	Setting initial random temperature to: 30 degrees.
+00:00.614	ID:4	Rime started with address 0.18.116.4.0.4.4.4
+00:00.622	ID:4	MAC 00:12:74:04:00:04:04:04 Contiki 2.7 started. Node id is set to 4.
+00:00.629	ID:4	CSMA nullrdc, channel check rate 128 Hz, radio channel 26
+00:00.639	ID:4	Tentative link-local IPv6 address fe80:0000:0000:0000:0212:7404:0004:0404
+00:00.641	ID:4	Starting 'Smart Thermostat'
+00:00.645	ID:4	Setting initial random temperature to: 28 degrees.
+00:00.981	ID:5	Rime started with address 0.18.116.5.0.5.5.5
+00:00.989	ID:5	MAC 00:12:74:05:00:05:05:05 Contiki 2.7 started. Node id is set to 5.
+00:00.996	ID:5	CSMA nullrdc, channel check rate 128 Hz, radio channel 26
+00:01.006	ID:5	Tentative link-local IPv6 address fe80:0000:0000:0000:0212:7405:0005:0505
+00:01.008	ID:5	Starting 'Smart Thermostat'
+00:01.012	ID:5	Setting initial random temperature to: 25 degrees.
+00:01.165	ID:3	Rime started with address 0.18.116.3.0.3.3.3
+00:01.173	ID:3	MAC 00:12:74:03:00:03:03:03 Contiki 2.7 started. Node id is set to 3.
+00:01.180	ID:3	CSMA nullrdc, channel check rate 128 Hz, radio channel 26
+00:01.190	ID:3	Tentative link-local IPv6 address fe80:0000:0000:0000:0212:7403:0003:0303
+00:01.192	ID:3	Starting 'Smart Thermostat'
+00:01.196	ID:3	Setting initial random temperature to: 11 degrees.
+08:23.463	ID:2	Changing ventilation to mode: off
+08:25.439	ID:2	Changing ac to mode: off
+08:26.417	ID:2	Changing heater to mode: off
+08:28.355	ID:3	Changing ventilation to mode: off
+08:31.010	ID:4	Changing ventilation to mode: off
+08:31.193	ID:3	Changing ac to mode: off
+08:31.306	ID:3	Changing heater to mode: off
+08:32.709	ID:4	Changing heater to mode: off
+08:32.945	ID:4	Changing ac to mode: off
+08:36.027	ID:5	Changing ventilation to mode: off
+08:38.373	ID:5	Changing heater to mode: off
+08:38.610	ID:5	Changing ac to mode: off
+09:35.577	ID:3	Changing heater to mode: on
+09:35.589	ID:4	Changing heater to mode: on
+09:35.733	ID:2	Changing heater to mode: on
+09:36.052	ID:5	Changing heater to mode: on
+09:40.528	ID:2	Updating Temperature to: 31
+09:40.640	ID:4	Updating Temperature to: 29
+09:41.007	ID:5	Updating Temperature to: 26
+09:41.223	ID:3	Updating Temperature to: 12
+10:00.528	ID:2	Updating Temperature to: 32
+10:00.640	ID:4	Updating Temperature to: 30
+10:01.007	ID:5	Updating Temperature to: 27
+10:01.223	ID:3	Updating Temperature to: 13
+10:20.528	ID:2	Updating Temperature to: 33
+10:20.640	ID:4	Updating Temperature to: 31
+10:21.007	ID:5	Updating Temperature to: 28
+10:21.223	ID:3	Updating Temperature to: 14
+10:28.905	ID:4	Changing heater to mode: off
+10:29.052	ID:5	Changing heater to mode: off
+10:31.466	ID:3	Changing heater to mode: off
+10:31.512	ID:2	Changing heater to mode: off
+10:37.372	ID:4	Changing ventilation to mode: on
+10:39.843	ID:4	Changing ac to mode: on
+10:40.640	ID:4	Updating Temperature to: 29
+10:42.330	ID:2	Changing ventilation to mode: on
+10:43.932	ID:2	Changing ac to mode: on
+10:51.157	ID:5	Changing ac to mode: on
+11:00.528	ID:2	Updating Temperature to: 31
+11:00.640	ID:4	Updating Temperature to: 27
+11:01.007	ID:5	Updating Temperature to: 27
+11:17.401	ID:5	Changing ventilation to mode: on
+11:20.528	ID:2	Updating Temperature to: 29
+11:20.640	ID:4	Updating Temperature to: 25
+11:21.007	ID:5	Updating Temperature to: 25
+11:40.528	ID:2	Updating Temperature to: 27
+11:40.640	ID:4	Updating Temperature to: 23
+11:41.007	ID:5	Updating Temperature to: 23
+12:00.528	ID:2	Updating Temperature to: 25
+12:00.640	ID:4	Updating Temperature to: 21
+12:01.007	ID:5	Updating Temperature to: 21
+12:20.528	ID:2	Updating Temperature to: 23
+12:20.640	ID:4	Updating Temperature to: 19
+12:21.007	ID:5	Updating Temperature to: 19
+12:28.052	ID:3	Changing ac to mode: on
+12:30.916	ID:3	Changing ventilation to mode: on
+12:40.528	ID:2	Updating Temperature to: 21
+12:40.640	ID:4	Updating Temperature to: 17
+12:41.007	ID:5	Updating Temperature to: 17
+12:41.223	ID:3	Updating Temperature to: 12
+13:00.528	ID:2	Updating Temperature to: 19
+13:00.640	ID:4	Updating Temperature to: 15
+13:01.007	ID:5	Updating Temperature to: 15
+13:01.223	ID:3	Updating Temperature to: 10
+13:20.528	ID:2	Updating Temperature to: 17
+13:20.640	ID:4	Updating Temperature to: 13
+13:21.007	ID:5	Updating Temperature to: 13
+13:21.222	ID:3	Updating Temperature to: 8
+13:40.528	ID:2	Updating Temperature to: 15
+13:40.640	ID:4	Updating Temperature to: 11
+13:41.007	ID:5	Updating Temperature to: 11
+13:41.222	ID:3	Updating Temperature to: 6
+14:00.528	ID:2	Updating Temperature to: 13
+14:00.640	ID:4	Updating Temperature to: 9
+14:01.007	ID:5	Updating Temperature to: 9
+14:01.222	ID:3	Updating Temperature to: 4
+14:20.528	ID:2	Updating Temperature to: 11
+14:20.640	ID:4	Updating Temperature to: 7
+14:21.007	ID:5	Updating Temperature to: 7
+14:21.222	ID:3	Updating Temperature to: 2
+14:28.319	ID:3	Changing ac to mode: on
+14:28.360	ID:2	Changing ac to mode: on
+14:30.846	ID:4	Changing ac to mode: on
+14:31.090	ID:5	Changing ac to mode: on
+14:33.658	ID:3	Changing ac to mode: off
+14:33.684	ID:5	Changing ac to mode: off
+14:33.725	ID:4	Changing ac to mode: off
+14:33.798	ID:2	Changing ac to mode: off
+14:34.778	ID:5	Changing ventilation to mode: on
+14:35.535	ID:2	Changing ventilation to mode: off
+14:36.041	ID:4	Changing ventilation to mode: on
+14:36.350	ID:3	Changing ventilation to mode: on
+14:36.390	ID:3	Changing ventilation to mode: off
+14:36.400	ID:2	Changing ventilation to mode: on
+14:36.850	ID:5	Changing ac to mode: off
+14:37.061	ID:5	Changing ventilation to mode: off
+14:40.056	ID:3	Changing ventilation to mode: off
+14:46.657	ID:5	Changing ac to mode: off
+14:48.408	ID:2	Changing ac to mode: off
+14:49.301	ID:4	Changing ventilation to mode: off
+14:49.771	ID:2	Changing ventilation to mode: off
